@@ -1,0 +1,10 @@
+{
+  "swagger": {
+    "swaggerPath": "./api/swagger.yaml",
+    "jsonPath": "/api-json",
+    "uiPath": "/api-docs"
+  },
+  "logger": {
+    "level": "info"
+  }
+}

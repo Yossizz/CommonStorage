@@ -1,0 +1,13 @@
+.git
+.vscode
+.idea
+
+*Dockerfile*
+*docker-compose*
+
+node_modules
+#TODO: uncomment config floder when adding confd
+#config
+
+*.md
+*.log
