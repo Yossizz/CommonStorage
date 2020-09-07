@@ -1,5 +1,7 @@
- 
 # Custom gitignors ignores goes here, below
+jest_html_reporters.html
+#TODO: uncomment config when adding confd
+#config
 
 #IDE
 .vscode
