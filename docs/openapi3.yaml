@@ -6,18 +6,24 @@ info:
 servers:
   - url: http://localhost:1337
 paths:
-  /helloworld:
+  /indexes:
     get:
       tags:
-        - helloWorld
-      summary: hello world
+        - indexes
+      summary: Get all indexes from the db. Use query parameters to select a specific one.
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/helloWorld"
+                $ref: "#/components/schemas/indexes"
+        400:
+          description: BAD_REQUEST  
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/indexes"
 components:
   parameters:
     idParam:
@@ -29,12 +35,9 @@ components:
         type: string
         format: uuid
   schemas:
-    helloWorld:
-      required:
-        - hello
-      type: object
+    indexes:
       properties:
-        hello:
+        index:
           type: string
       example:
-        hello: world
+        matches: [{"_index": "test"}]
