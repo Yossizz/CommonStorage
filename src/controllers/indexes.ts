@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable } from 'tsyringe';
-import client from '../elasticClient';
+import client from '../../config/elasticClient';
 import { ApiResponse } from '@elastic/elasticsearch';
 
 @injectable()
 export class IndexesController {
 
-  private errorMessage(errorObject: any): object {
+  private errorMessage(errorObject: any): any {
     if (errorObject.meta.body) {
       const { body } = errorObject.meta;
       return {
@@ -30,8 +30,9 @@ export class IndexesController {
       const indexes: ApiResponse = await client.indices.get({ index: '_all' });
       return res.status(httpStatus.OK).json({ indexes });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err));
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
@@ -41,8 +42,9 @@ export class IndexesController {
       const indexes: ApiResponse = await client.indices.get({ index: name });
       return res.status(httpStatus.OK).json({ indexes });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err));
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
@@ -52,8 +54,9 @@ export class IndexesController {
       const newIndex: ApiResponse = await client.indices.create({ index });
       return res.status(httpStatus.OK).json({ newIndex });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err))
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
@@ -63,8 +66,9 @@ export class IndexesController {
       const deletedIndex: ApiResponse = await client.indices.delete({ index: name });
       return res.status(httpStatus.OK).json({ deletedIndex });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err))
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
@@ -76,8 +80,9 @@ export class IndexesController {
       const newDocument = await client.index({ index: name, body });
       return res.status(httpStatus.OK).json({ newDocument });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err))
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
@@ -89,29 +94,31 @@ export class IndexesController {
       const deletedDocument = await client.delete({ index: name, id });
       return res.status(httpStatus.OK).json({ deletedDocument });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err))
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 
   public async searchDocument(req: Request, res: Response): Promise<Response> {
     try {
       const { name }: any = req.params;
-      const { query: match }: any = req;
+      const match: any = req.query;
+
+      // If no request query, return all documents
+      const query : any = Object.keys(match).length ? { match } : { match_all: {} };
 
       const searchResults: ApiResponse = await client.search({
         index: name, body: {
-          query: {
-            match
-          }
-        }
+          query
+        },
       });
-
 
       return res.status(httpStatus.OK).json({ searchResults });
     } catch (err) {
-      return res.status(httpStatus.BAD_REQUEST)
-        .json(this.errorMessage(err))
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status)
+        .json(errorSimplified);
     }
   }
 }
