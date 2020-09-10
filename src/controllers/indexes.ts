@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable } from 'tsyringe';
-import client from '../../config/elasticClient';
+import client from '../elasticClient';
 import { ApiResponse } from '@elastic/elasticsearch';
 
 @injectable()
