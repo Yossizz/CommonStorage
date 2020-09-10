@@ -50,6 +50,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^7.9.0",
     "@map-colonies/mc-logger": "^1.2.1",
     "@map-colonies/mc-model-types": "^1.0.1",
     "@map-colonies/mc-probe": "^1.0.0",

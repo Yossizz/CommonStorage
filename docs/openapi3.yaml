@@ -1,40 +1,156 @@
 openapi: 3.0.1
 info:
-  title: service-name
-  description: basic template for map colonies service
+  title: Common Storage Service
+  description: An Elasticsearch generic service for common usecases.
   version: 1.0.0
 servers:
-  - url: http://localhost:1337
+  - url: http://localhost:80/
 paths:
-  /helloworld:
+  /indexes:
     get:
       tags:
-        - helloWorld
-      summary: hello world
+        - indexes
+      summary: Get all indexes from the database.
       responses:
         200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/helloWorld"
+          description: All indexes.
+        404:
+          description: No indexes in the database.
+        400:
+          description: Invalid request, could not retrieve indexes.
+    post:
+      tags:
+        - indexes
+      summary: Create a new index and returns it.
+      requestBody:
+        description: The properties that need to be sent.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/indexes'
+        required: true
+      responses:
+        200:
+          description: Returns the created index.
+        400:
+          description: Invalid request, could not create index.
+          
+  /indexes/{name}:
+    get:
+      tags:
+        - indexes
+      summary: Get a specific index.
+      parameters: 
+      -  $ref: '#/components/parameters/nameParameter'
+      responses:
+        200:
+          description: Information about the index.
+        404:
+          description: Index not found.
+        400: 
+          description: Invalid request, could not retrieve index.
+    delete:
+      tags:
+        - indexes
+      summary: Delete the specific index and returns it.
+      parameters: 
+      - name: name
+        in: path
+        description: The name of the required index.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Information about the deleted index.
+        404:
+          description: Index not found, did not delete.
+        400: 
+          description: Invalid request, could not retrieve index.        
+          
+  /indexes/{name}/document:
+   get:
+      tags:
+        - indexes
+      summary: Get all documents from specific index.
+      parameters: 
+      -  $ref: '#/components/parameters/nameParameter'
+      - name: field(s)
+        in: query
+        description: The field(s) to search over.
+        schema:
+          type: string
+      responses:
+        200:
+          description: All documents matching the criteria. If not supplied, returns all documents.
+        404:
+          description: Index not found.
+        400: 
+          description: Invalid request, could not retrieve index.     
+   post:
+    tags:
+      - indexes 
+    summary: Create a new document in the index.
+    requestBody:
+        description: Example of request body input
+        required: true  
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/documents'
+    parameters:
+    -  $ref: '#/components/parameters/nameParameter'
+    responses:
+      200:
+        description: Creates the document and returns it.
+      404:
+        description: Index not found, did not create document.
+      400: 
+          description: Invalid request, could not retrieve index.      
+
+  /indexes/{name}/document/{documentId}:
+    delete:
+      tags:
+      - indexes
+      summary: Deletes a specific document.
+      parameters:
+      -  $ref: '#/components/parameters/nameParameter'
+      - name: documentId
+        in: path
+        required: true
+        description: ID of the document to delete.
+        schema:
+          type: string
+      responses:
+        200:
+          description: Creates the document and returns it.
+        404:
+          description: Index not found, did not create document.
+        400: 
+            description: Invalid request, could not retrieve index.      
+    
 components:
   parameters:
-    idParam:
-      name: id
-      in: query
-      description: id of requested item
+    nameParameter:
+      name: name
+      in: path
+      description: Name of the index
       required: true
       schema:
         type: string
-        format: uuid
   schemas:
-    helloWorld:
-      required:
-        - hello
-      type: object
+    indexes:
       properties:
-        hello:
+        index:
           type: string
       example:
-        hello: world
+        index: test
+    documents:
+      properties:
+        index:
+          type: string
+        body:
+          type: object
+      example:
+        index: test
+        body: { firstName: "Moshe", lastName: "Shalom" }  

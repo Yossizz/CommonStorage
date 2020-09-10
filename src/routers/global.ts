@@ -1,9 +1,12 @@
 import { Router } from 'express';
-import { helloWorldRouter } from './helloWorld';
 import { swaggerRouter } from './swagger';
+import * as bodyparser from 'body-parser';
+import { indexesRouter } from './indexes';
 
 const globalRouter = Router();
+globalRouter.use(bodyparser.json());
+
 globalRouter.use(swaggerRouter);
-globalRouter.use('/helloWorld', helloWorldRouter);
+globalRouter.use('/indexes', indexesRouter);
 
 export { globalRouter };
