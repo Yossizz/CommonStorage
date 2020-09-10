@@ -11,6 +11,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": ["./src", "index.ts", "src/elasticClient.ts"],
+  "include": ["./src", "index.ts"],
   "exclude": ["node_modules", "dist"]
 }
