@@ -72,12 +72,12 @@ paths:
    get:
       tags:
         - indexes
-      summary: Get all documents from specific index.
+      summary: Get documents from specific index.
       parameters: 
       -  $ref: '#/components/parameters/nameParameter'
       - name: field(s)
         in: query
-        description: The field(s) to search over.
+        description: The field(s) to search over. If empty - returns all documents.
         schema:
           type: string
       responses:
@@ -147,10 +147,7 @@ components:
         index: test
     documents:
       properties:
-        index:
-          type: string
         body:
           type: object
       example:
-        index: test
         body: { firstName: "Moshe", lastName: "Shalom" }  

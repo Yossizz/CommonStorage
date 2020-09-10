@@ -6,5 +6,10 @@
   },
   "logger": {
     "level": "info"
+  },
+  "elasticConfig": {
+    "node": "http://10.28.11.49:9200/",
+    "maxRetries": 5,
+    "requestTimeout": 60000
   }
 }
