@@ -1,11 +1,17 @@
 # Custom gitignors ignores goes here, below
 jest_html_reporters.html
-#TODO: uncomment config when adding confd
-#config
 
 #IDE
 .vscode
 .idea
+
+#CONFD
+config
+confd/**
+!confd/*.js
+!confd/*.tmpl
+!confd/*.toml
+
 
 # This .gitignore is taken from
 # https://github.com/github/gitignore/blob/master/Node.gitignore

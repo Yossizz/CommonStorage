@@ -1,0 +1,6 @@
+[template]
+src = "production.tmpl"
+dest = "../config/default.json"
+keys = [
+   "/elastic/node"
+]

@@ -1,0 +1,13 @@
+{
+    "swagger" : {
+        "swaggerPath": "./api/swagger.yaml",
+        "jsonPath": "/api-json",
+        "uiPath": "/api-docs"        
+    },
+    "logger": {
+        "level": "info"
+    },
+    "elastic" : {
+        "node": "{{ getv "/elastic/node" "http://10.28.11.49:9200/" }}"
+    }
+}

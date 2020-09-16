@@ -1,7 +1,8 @@
-import { Client } from '@elastic/elasticsearch';
+import { Client, ClientOptions } from '@elastic/elasticsearch';
 import { get } from 'config';
 
+const elasticConfig : ClientOptions = get("elastic");
 // Create the client instance
-const client = new Client(get("elasticConfig"));
+const client = new Client(elasticConfig);
 
 export default client;

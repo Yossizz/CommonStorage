@@ -11,7 +11,9 @@
     "release": "standard-version",
     "test": "npm run lint && npm run test:unit && npm run test:integration",
     "build": "tsc --project tsconfig.build.json && copyfiles ./docs ./config dist",
-    "start": "npm run build && node ./dist/index.js"
+    "start": "npm run build && node ./dist/index.js",
+    "confd": "node ./confd/generate-config.js",
+    "confd:prod": "node ./confd/generate-config.js --environment production"
   },
   "directories": {
     "test": "tests"
