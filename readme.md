@@ -1,39 +1,22 @@
-# Map Colonies typescript service template
+# CommonStorage
 
-This is a basic template for building new map colonies services in typescript.
+CommonStorage is a Node.js & Elasticsearch service for storing and handling static data sets, and is best for when you want to do fast full-text searches over your application data.
 
-### template features:
+## Installation
 
-- map-colonies "work-standard" prettier configuration.
-- map-colonies typescript eslint configuration.
-- docker file and map-colonies probe for containerization.
-- dependency injection
-- map-colonies logger and basic logging code:
-  - basic global error handler middleware
-  - incoming requests logging middleware
-  - startup logs
-
-### usage:
-
-1. copy the template files to new service repository.
-1. run `npm install `.
-1. run `npm rebuild husky` to configure commit messages linting.
-1. add the required logic for the new service:
-   - to add new routes: create an express router and connect it to express server in ServerBuilder registerControllers function. when adding handler to the router make sure to add "validate" middleware from 'openapi-validator-middleware' for request validation.
-   - modify the global error handler in the middleware folder to return better error responses and catch the errors before the global handler (currently it returns empty 500 response )
-
-### usage notes:
-
-1. when importing external dependencies from DI (such as McLogger) in class constructor the following decorator must be used to retrieve instance:
-
-```typescript
-@inject(delay(() => <injection token>)) <variable definition>
+```
+npm install
 ```
 
-usage example:
+## Usage
 
-```typescript
-public constructor(
-    @inject(delay(() => MCLogger)) private readonly logger: MCLogger) {
-  }
 ```
+npm start
+```
+You should review the Swagger API located in `/api-docs` to save some time during the process. 
+
+## Configuration
+// ...
+
+#
+**CommonStorage evolves all the time**

@@ -75,11 +75,14 @@ paths:
       summary: Get documents from specific index.
       parameters: 
       -  $ref: '#/components/parameters/nameParameter'
-      - name: field(s)
-        in: query
-        description: The field(s) to search over. If empty - returns all documents.
+      - in: query
+        name: params
+        required: false
         schema:
-          type: string
+          type: object
+          additionalProperties: {}
+        example:
+          user_id: 123456
       responses:
         200:
           description: All documents matching the criteria. If not supplied, returns all documents.
@@ -99,7 +102,7 @@ paths:
             schema:
               $ref: '#/components/schemas/documents'
     parameters:
-    -  $ref: '#/components/parameters/nameParameter'
+    - $ref: '#/components/parameters/nameParameter'
     responses:
       200:
         description: Creates the document and returns it.
@@ -114,13 +117,13 @@ paths:
       - indexes
       summary: Deletes a specific document.
       parameters:
-      -  $ref: '#/components/parameters/nameParameter'
       - name: documentId
         in: path
         required: true
         description: ID of the document to delete.
         schema:
           type: string
+      - $ref: '#/components/parameters/nameParameter'
       responses:
         200:
           description: Creates the document and returns it.
