@@ -1,22 +1,23 @@
-# CommonStorage
+# CommonStorage Introduction
 
-CommonStorage is a Node.js & Elasticsearch service for storing and handling static data sets, and is best for when you want to do fast full-text searches over your application data.
+CommonStorage is a RESTful Node.js service that allows you to store and handle static data-sets with the ability to make fast & powerful full-text search over your application data. 
 
-## Installation
+We use [Elasticsearch](https://www.elastic.co/) as a database, which allows *(near) real time text-search*.
 
-```
-npm install
-```
 
 ## Usage
+These are examples for REST requests you can make. However, you should review the Swagger API at `/api-docs` to save some time during the process.
 
 ```
-npm start
+// Information about an index
+{GET} http://{server}/indexes/{indexName}
+
+// Create a new index
+{POST} http://{server}/indexes
+
+// Create a document in an index
+{POST} http://{server}/indexes/{indexName}
+
+// Search for a document by fields
+{GET} http://{server}/indexes/{documentName}?{key1=value1}&{key2=value2}
 ```
-You should review the Swagger API located in `/api-docs` to save some time during the process. 
-
-## Configuration
-// ...
-
-#
-**CommonStorage evolves all the time**
