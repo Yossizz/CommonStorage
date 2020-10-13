@@ -2,5 +2,9 @@
 src = "production.tmpl"
 dest = "../config/default.json"
 keys = [
-   "/elastic/node"
+    "/configuration/logger/level",
+    "/configuration/swagger/jsonPath",
+    "/configuration/swagger/uiPath",
+    "/configuration/swagger/port",
+    "/elastic/node"
 ]

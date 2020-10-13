@@ -1,13 +1,13 @@
 {
-    "swagger" : {
-        "swaggerPath": "./api/swagger.yaml",
-        "jsonPath": "/api-json",
-        "uiPath": "/api-docs"        
-    },
-    "logger": {
-        "level": "info"
-    },
-    "elastic" : {
-        "node": "{{ getv "/elastic/node" "http://10.28.11.49:9200/" }}"
-    }
+"swagger": {
+    "jsonPath": "{{ getv "/configuration/swagger/jsonPath" "/api-json" }}",
+    "uiPath": "{{ getv "/configuration/swagger/uiPath" "/api-docs" }}",
+    "portOverride": "{{ getv "/configuration/swagger/port" "80" }}"
+  },
+  "logger": {
+    "level": "{{ getv "/configuration/logger/level" "error" }}"
+  },
+  "elastic": {
+    "node": "{{ getv "/elastic/node" "http://10.28.11.49:9200/" }}"
+  }
 }
