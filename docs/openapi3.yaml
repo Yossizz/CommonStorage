@@ -82,7 +82,7 @@ paths:
           type: object
           additionalProperties: {}
         example:
-          user_id: 123456
+          _id: 123456
       responses:
         200:
           description: All documents matching the criteria. If not supplied, returns all documents.
@@ -109,7 +109,36 @@ paths:
       404:
         description: Index not found, did not create document.
       400: 
-          description: Invalid request, could not retrieve index.      
+          description: Invalid request, could not retrieve index.    
+          
+   put:
+    tags:
+      - indexes 
+    summary: Request processed - response tells if it updated sucessfully or did not update (because the document does not exist)
+    requestBody:
+        description: Example of request body input
+        required: true  
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/documents'
+    parameters:
+    - $ref: '#/components/parameters/nameParameter'
+    - in: query
+      name: params
+      required: false
+      schema:
+        type: object
+        additionalProperties: {}
+      example:
+        customID: 123
+    responses:
+      200:
+        description: Updates the document and returns data about the transaction.
+      404:
+        description: Index not found, did not update document.
+      400: 
+          description: Invalid request, could not retrieve index.           
 
   /indexes/{name}/document/{documentId}:
     delete:
@@ -150,7 +179,7 @@ components:
         index: test
     documents:
       properties:
-        body:
+        params:
           type: object
       example:
-        body: { firstName: "Moshe", lastName: "Shalom" }  
+        params: { firstName: "Moshe", lastName: "Shalom" }  
