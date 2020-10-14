@@ -76,9 +76,9 @@ export class IndexesController {
   public async addDocument(req: Request, res: Response): Promise<Response> {
     try {
       const { name }: any = req.params;
-      const body: object = req.body.body;
+      const { params } = req.body;
 
-      const newDocument = await client.index({ index: name, body });
+      const newDocument = await client.index({ index: name, body: params });
       return res.status(httpStatus.OK).json(newDocument);
     } catch (err) {
       const errorSimplified = this.errorMessage(err);
@@ -104,9 +104,9 @@ export class IndexesController {
 
   public async searchDocument(req: Request, res: Response): Promise<Response> {
     try {
-      const { name }: any = req.params;
+      const { name } = req.params;
 
-      const elasticQuery: object = this.buildElasticQuery(req.query);
+      const elasticQuery = this.buildElasticQuery(req.query);
 
       const searchResults: ApiResponse = await client.search({
         index: name,
@@ -131,10 +131,36 @@ export class IndexesController {
     }
   }
 
-  // We get a key:value seearchobject that contains the request parameters
+  public async updateDocument(req: Request, res: Response): Promise<Response> {
+    try {
+      const { name } = req.params;
+      const { params } = req.body;
+
+      const elasticQuery = this.buildElasticQuery(req.query);
+      const source = this.buildElasticSource(params);
+
+      const updatedDoc: ApiResponse = await client.updateByQuery({
+        index: name,
+        body: {
+          query: elasticQuery,
+          script: {
+            lang: 'painless',
+            source,
+            params,
+          },
+        },
+      });
+      return res.send(updatedDoc).status(httpStatus.OK);
+    } catch (err) {
+      const errorSimplified = this.errorMessage(err);
+      return res.status(errorSimplified.status).json(errorSimplified);
+    }
+  }
+
+  // We get a key:value seearch-object that contains the request parameters
   // and we parser it to elastic typed search object
   // https://stackoverflow.com/questions/39507005/query-with-match-by-multiple-fields
-  
+
   private buildElasticQuery(query: any): object {
     if (Object.keys(query).length) {
       const match: object = Object.keys(query).map((param) => {
@@ -145,5 +171,17 @@ export class IndexesController {
       // If no query parameter is supplied, return all documents
       return { match_all: {} };
     }
+  }
+
+  // An elastic 'painless' string that contains the values that we want to replace
+  // with the new values
+  private buildElasticSource(body: any): string {
+    const prefix = 'ctx._source';
+    let source = '';
+
+    for (let key of Object.keys(body)) {
+      source += prefix + '.' + key + '=params.' + key + ';';
+    }
+    return source;
   }
 }
