@@ -12,7 +12,6 @@ indexesRouter.post('/', validate, controller.create.bind(controller));
 indexesRouter.delete('/:name', validate, controller.delete.bind(controller));
 
 indexesRouter.post('/:name/document', validate, controller.addDocument.bind(controller));
-indexesRouter.put('/:name/document', controller.updateDocument.bind(controller));
 indexesRouter.delete('/:name/document/:documentId', validate, controller.deleteDocument.bind(controller));
 // TODO: add validator. Issue at: https://github.com/PayU/openapi-validator-middleware/issues/140
 indexesRouter.get('/:name/document', controller.searchDocument.bind(controller));
