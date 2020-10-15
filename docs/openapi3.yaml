@@ -141,18 +141,38 @@ paths:
           description: Invalid request, could not retrieve index.           
 
   /indexes/{name}/document/{documentId}:
+    get:
+      tags:
+      - indexes
+      summary: Get a document by its unique ID.
+      parameters:
+      - $ref: '#/components/parameters/nameParameter'
+      - name: documentId
+        in: path
+        required: true
+        description: ID of the document to delete.
+        schema:
+          type: string      
+      responses:
+        200:
+          description: Returns the document.
+        404:
+          description: Document not fond.
+        400: 
+            description: Invalid request, could not retrieve index.      
+
     delete:
       tags:
       - indexes
       summary: Deletes a specific document.
       parameters:
+      - $ref: '#/components/parameters/nameParameter'
       - name: documentId
         in: path
         required: true
         description: ID of the document to delete.
         schema:
           type: string
-      - $ref: '#/components/parameters/nameParameter'
       responses:
         200:
           description: Creates the document and returns it.

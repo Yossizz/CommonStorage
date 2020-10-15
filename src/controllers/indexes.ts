@@ -6,23 +6,6 @@ import { ApiResponse } from '@elastic/elasticsearch';
 
 @injectable()
 export class IndexesController {
-  private errorMessage(errorObject: any): any {
-    if (errorObject.meta.body) {
-      const { body } = errorObject.meta;
-      return {
-        status: body.status,
-        type: body.error.type,
-        reason: body.error.reason,
-      };
-    } else {
-      return {
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        type: 'Internal',
-        reason: 'An unknown error occured',
-      };
-    }
-  }
-
   public async getAll(req: Request, res: Response): Promise<Response> {
     try {
       const indexes: ApiResponse = await client.indices.get({
@@ -30,66 +13,76 @@ export class IndexesController {
       });
       return res.status(httpStatus.OK).json(indexes.body);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
 
   public async getOne(req: Request, res: Response): Promise<Response> {
     try {
-      const { name }: any = req.params;
+      const { name } = req.params;
       const index: ApiResponse = await client.indices.get({
         index: name,
       });
 
       return res.status(httpStatus.OK).json(index.body);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
 
   public async create(req: Request, res: Response): Promise<Response> {
     try {
-      const index: string = req.body.index;
+      const { index } = req.body;
       const newIndex: ApiResponse = await client.indices.create({ index });
       return res.status(httpStatus.OK).json(newIndex);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
 
   public async delete(req: Request, res: Response): Promise<Response> {
     try {
-      const { name }: any = req.params;
+      const { name } = req.params;
       const deletedIndex: ApiResponse = await client.indices.delete({
         index: name,
       });
       return res.status(httpStatus.OK).json(deletedIndex);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
+      return res.status(errorSimplified.status).json(errorSimplified);
+    }
+  }
+
+  public async getDoucmentById(req: Request, res: Response): Promise<Response> {
+    try {
+      const { documentId, name } = req.params;
+      const document = await client.get({ index: name, id: documentId });
+      return res.status(httpStatus.OK).json(document);
+    } catch (err) {
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
 
   public async addDocument(req: Request, res: Response): Promise<Response> {
     try {
-      const { name }: any = req.params;
+      const { name } = req.params;
       const { params } = req.body;
 
       const newDocument = await client.index({ index: name, body: params });
       return res.status(httpStatus.OK).json(newDocument);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
 
   public async deleteDocument(req: Request, res: Response): Promise<Response> {
     try {
-      const { name }: any = req.params;
-      const { documentId }: any = req.params;
+      const { name, documentId }: any = req.params;
 
       const deletedDocument = await client.delete({
         index: name,
@@ -97,7 +90,7 @@ export class IndexesController {
       });
       return res.status(httpStatus.OK).json(deletedDocument);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
@@ -126,7 +119,7 @@ export class IndexesController {
 
       return res.status(httpStatus.OK).json(items);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
@@ -172,6 +165,24 @@ export class IndexesController {
       return { match_all: {} };
     }
   }
+
+  private buildErrorMessage(errorObject: any): any {
+    if (errorObject.meta.body) {
+      const { body } = errorObject.meta;
+      return {
+        status: body.status,
+        type: body.error.type,
+        reason: body.error.reason,
+      };
+    } else {
+      return {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        type: 'Internal',
+        reason: 'An unknown error occured',
+      };
+    }
+  }
+}
 
   // An elastic 'painless' string that contains the values that we want to replace
   // with the new values
