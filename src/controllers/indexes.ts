@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable } from 'tsyringe';
-import client from '../elasticClient';
 import { ApiResponse } from '@elastic/elasticsearch';
+import client from '../elasticClient';
 
 @injectable()
 export class IndexesController {
@@ -145,7 +145,7 @@ export class IndexesController {
       });
       return res.send(updatedDoc).status(httpStatus.OK);
     } catch (err) {
-      const errorSimplified = this.errorMessage(err);
+      const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
     }
   }
@@ -167,7 +167,7 @@ export class IndexesController {
   }
 
   private buildErrorMessage(errorObject: any): any {
-    if (errorObject.meta.body) {
+    if (errorObject && errorObject.meta && errorObject.meta.body) {
       const { body } = errorObject.meta;
       return {
         status: body.status,
@@ -182,7 +182,6 @@ export class IndexesController {
       };
     }
   }
-}
 
   // An elastic 'painless' string that contains the values that we want to replace
   // with the new values
