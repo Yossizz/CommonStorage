@@ -76,6 +76,7 @@ paths:
       parameters: 
       -  $ref: '#/components/parameters/nameParameter'
       - in: query
+        description: Fields that are the criteria - document must match the fields supplied. If empty - returns all documents.
         name: params
         required: false
         schema:
@@ -83,9 +84,25 @@ paths:
           additionalProperties: {}
         example:
           _id: 123456
+      - in: query
+        description: The offset to start the searching from. Default is 0.
+        name: from
+        required: false
+        schema:
+          type: number
+        example:
+          50
+      - in: query
+        description: Size of reslts to return from the server. Default is 10.
+        name: size
+        required: false
+        schema:
+          type: number
+        example:
+          4       
       responses:
         200:
-          description: All documents matching the criteria. If not supplied, returns all documents.
+          description: Returns all documents that met the criteria.
         404:
           description: Index not found.
         400: 

@@ -2,7 +2,14 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status-codes';
 import { injectable } from 'tsyringe';
 import { ApiResponse } from '@elastic/elasticsearch';
+import { get } from 'config';
 import client from '../elasticClient';
+
+interface IELasticRequest {
+  from: number;
+  size: number;
+}
+const elasticRequest: IELasticRequest = get('elasticRequest');
 
 @injectable()
 export class IndexesController {
@@ -98,6 +105,13 @@ export class IndexesController {
   public async searchDocument(req: Request, res: Response): Promise<Response> {
     try {
       const { name } = req.params;
+      
+      const from = Number(req.query.from) || elasticRequest.from;
+      const size = Number(req.query.size) || elasticRequest.size;
+
+      // Delete [from] and [size] from req.query so we won't search for it in our records
+      delete req.query.size;
+      delete req.query.from;
 
       const elasticQuery = this.buildElasticQuery(req.query);
 
@@ -106,6 +120,8 @@ export class IndexesController {
         body: {
           query: elasticQuery,
         },
+        from,
+        size,
       });
 
       // Return a prettier JSON result

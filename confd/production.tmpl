@@ -9,5 +9,9 @@
   },
   "elastic": {
     "node": "{{ getv "/elastic/node" "http://10.28.11.49:9200/" }}"
+  },
+  "elasticRequests": {
+    "from": "{{ getv "/elastic/from" "0" }}",
+    "size": "{{ getv "/elastic/size" "10" }}"
   }
 }
