@@ -1,7 +1,7 @@
 import swaggerUi from 'swagger-ui-express';
 import { get } from 'config';
 import { MCLogger } from '@map-colonies/mc-logger';
-import { Request, Response, RequestHandler, NextFunction } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import { load } from 'yamljs';
 import { injectable, delay, inject } from 'tsyringe';
 import { config as initDotEnv } from 'dotenv';

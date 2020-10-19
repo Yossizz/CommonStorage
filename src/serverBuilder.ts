@@ -23,13 +23,13 @@ export class ServerBuilder {
     await validatorInit('./docs/openapi3.yaml');
 
     this.registerMiddleware();
-    this.serverInstance.use(globalRouter);
 
     return this.serverInstance;
   }
 
   private registerMiddleware(): void {
     this.serverInstance.use(this.requestLogger.getLoggerMiddleware());
+    this.serverInstance.use(globalRouter);
     this.serverInstance.use(this.errorHandler.getErrorHandlerMiddleware());
   }
 }
