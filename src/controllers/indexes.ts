@@ -6,8 +6,8 @@ import { get } from 'config';
 import client from '../elasticClient';
 
 interface IELasticRequest {
-  from: number;
-  size: number;
+  from?: number;
+  size?: number;
 }
 const elasticRequest: IELasticRequest = get('elasticRequest');
 
@@ -74,19 +74,6 @@ export class IndexesController {
     }
   }
 
-  public async addDocument(req: Request, res: Response): Promise<Response> {
-    try {
-      const { name } = req.params;
-      const { params } = req.body;
-
-      const newDocument = await client.index({ index: name, body: params });
-      return res.status(httpStatus.OK).json(newDocument);
-    } catch (err) {
-      const errorSimplified = this.buildErrorMessage(err);
-      return res.status(errorSimplified.status).json(errorSimplified);
-    }
-  }
-
   public async deleteDocument(req: Request, res: Response): Promise<Response> {
     try {
       const { name, documentId }: any = req.params;
@@ -105,30 +92,16 @@ export class IndexesController {
   public async searchDocument(req: Request, res: Response): Promise<Response> {
     try {
       const { name } = req.params;
-      
-      const from = Number(req.query.from) || elasticRequest.from;
-      const size = Number(req.query.size) || elasticRequest.size;
-
-      // Delete [from] and [size] from req.query so we won't search for it in our records
-      delete req.query.size;
-      delete req.query.from;
-
-      const elasticQuery = this.buildElasticQuery(req.query);
-
-      const searchResults: ApiResponse = await client.search({
-        index: name,
-        body: {
-          query: elasticQuery,
-        },
-        from,
-        size,
-      });
+      const searchResults: ApiResponse = await this.innerSearchDoc(
+        name,
+        req.query
+      );
 
       // Return a prettier JSON result
       const items = searchResults.body.hits.hits.map((res: any) => {
         return {
           index: res.index,
-          id: res._id,
+          _id: res._id,
           ...res._source,
         };
       });
@@ -140,26 +113,26 @@ export class IndexesController {
     }
   }
 
-  public async updateDocument(req: Request, res: Response): Promise<Response> {
+  public async createOrUpdateDocument(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
     try {
       const { name } = req.params;
+      const query = req.query;
       const { params } = req.body;
+      const searchResults = await this.innerSearchDoc(name, query);
 
-      const elasticQuery = this.buildElasticQuery(req.query);
-      const source = this.buildElasticSource(params);
+      let objectRetrurned = null;
+      if (searchResults.body.hits.hits.length) {
+        // we found hits. need to update
+        objectRetrurned = await this.innerUpdateByQuery(name, req.query, params);
+      } else {
+        // create
+        objectRetrurned = await this.innerCreateDoc(name, params);
+      }
 
-      const updatedDoc: ApiResponse = await client.updateByQuery({
-        index: name,
-        body: {
-          query: elasticQuery,
-          script: {
-            lang: 'painless',
-            source,
-            params,
-          },
-        },
-      });
-      return res.send(updatedDoc).status(httpStatus.OK);
+      return res.status(httpStatus.OK).json(objectRetrurned);
     } catch (err) {
       const errorSimplified = this.buildErrorMessage(err);
       return res.status(errorSimplified.status).json(errorSimplified);
@@ -209,5 +182,48 @@ export class IndexesController {
       source += prefix + '.' + key + '=params.' + key + ';';
     }
     return source;
+  }
+
+  private async innerCreateDoc(index: string, body: object ) : Promise<ApiResponse> {
+    return await client.index({ index, body });
+  }
+
+  private async innerSearchDoc(index: string, q: IELasticRequest): Promise<ApiResponse> {
+   const from = Number(q.from) || elasticRequest.from;
+   const size = Number(q.size) || elasticRequest.size;
+    
+   delete q.size;
+   delete q.from;
+
+    const elasticQuery = this.buildElasticQuery(q);
+    return await client.search({
+      index,
+      body: {
+        query: elasticQuery,
+      },
+      from,
+      size
+    });
+  }
+
+  private async innerUpdateByQuery(
+    index: string,
+    q: object,
+    params: object
+  ): Promise<ApiResponse> {
+    const elasticQuery = this.buildElasticQuery(q);
+    const source = this.buildElasticSource(params);
+
+    return await client.updateByQuery({
+      index,
+      body: {
+        query: elasticQuery,
+        script: {
+          lang: 'painless',
+          source,
+          params,
+        },
+      },
+    });
   }
 }

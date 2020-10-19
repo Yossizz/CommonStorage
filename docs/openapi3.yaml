@@ -110,28 +110,7 @@ paths:
    post:
     tags:
       - indexes 
-    summary: Create a new document in the index.
-    requestBody:
-        description: Example of request body input
-        required: true  
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/documents'
-    parameters:
-    - $ref: '#/components/parameters/nameParameter'
-    responses:
-      200:
-        description: Creates the document and returns it.
-      404:
-        description: Index not found, did not create document.
-      400: 
-          description: Invalid request, could not retrieve index.    
-          
-   put:
-    tags:
-      - indexes 
-    summary: Request processed - response tells if it updated sucessfully or did not update (because the document does not exist)
+    summary: Create or update a document in the index.
     requestBody:
         description: Example of request body input
         required: true  
@@ -142,20 +121,22 @@ paths:
     parameters:
     - $ref: '#/components/parameters/nameParameter'
     - in: query
-      name: params
+      name: search
+      description: The criteria for the records that we look for. If criteria are matched - it updates. If no records are found - it creates. 
+                    If no criteria supplied - it updates ALL records.
       required: false
       schema:
         type: object
         additionalProperties: {}
       example:
-        customID: 123
+        _id: 123456
     responses:
       200:
-        description: Updates the document and returns data about the transaction.
+        description: Creates the document and returns it.
       404:
-        description: Index not found, did not update document.
+        description: Index not found, did not create document.
       400: 
-          description: Invalid request, could not retrieve index.           
+          description: Invalid request, could not retrieve index.        
 
   /indexes/{name}/document/{documentId}:
     get:
