@@ -7,8 +7,8 @@ import { MCLogger } from '@map-colonies/mc-logger';
 import client from '../elasticClient';
 
 interface IElasticRequestConfig {
-  from?: number;
-  size?: number;
+  from: number;
+  size: number;
 }
 
 @injectable()
@@ -110,7 +110,9 @@ export class IndexesController {
         index: name,
         id: documentId,
       });
-      this.logger.info(`Doucment ID ${documentId} from index ${name} was deleted`);
+      this.logger.info(
+        `Doucment ID ${documentId} from index ${name} was deleted`
+      );
       return res.status(httpStatus.OK).json(deletedDocument);
     } catch (err) {
       return next(err);
@@ -153,7 +155,7 @@ export class IndexesController {
       const { name } = req.params;
       const query = req.query;
       const { params } = req.body;
-      const searchResults : ApiResponse = await this.innerSearchDoc(name, query);
+      const searchResults: ApiResponse = await this.innerSearchDoc(name, query);
 
       let objectRetrurned = null;
       if (searchResults.body.hits.hits.length) {
@@ -213,15 +215,15 @@ export class IndexesController {
 
   private async innerSearchDoc(
     index: string,
-    q: IElasticRequestConfig
+    reqQuery: any
   ): Promise<ApiResponse> {
-    const from = Number(q.from) || this.elasticRequestCfg.from;
-    const size = Number(q.size) || this.elasticRequestCfg.size;
 
-    delete q.size;
-    delete q.from;
+    let { from, size, ...restParams } = reqQuery;
+    from = Number(from) || this.elasticRequestCfg.from;
+    size = size ? Math.min(Number(size), this.elasticRequestCfg.size)
+                    : this.elasticRequestCfg.size;    
 
-    const elasticQuery = this.buildElasticQuery(q);
+    const elasticQuery = this.buildElasticQuery(restParams);
     return await client.search({
       index,
       body: {
