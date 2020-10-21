@@ -219,8 +219,8 @@ export class IndexesController {
   ): Promise<ApiResponse> {
 
     let { from, size, ...restParams } = reqQuery;
-    from = Number(from) || this.elasticRequestCfg.from;
-    size = size ? Math.min(Number(size), this.elasticRequestCfg.size)
+    from = Number(from) >= 0 ? Math.round(Number(from)) : this.elasticRequestCfg.from;
+    size = size > 0 ? Math.min(Number(size), this.elasticRequestCfg.size)
                     : this.elasticRequestCfg.size;    
 
     const elasticQuery = this.buildElasticQuery(restParams);

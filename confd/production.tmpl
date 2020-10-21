@@ -8,10 +8,10 @@
     "level": "{{ getv "/configuration/logger/level" "error" }}"
   },
   "elastic": {
-    "node": "{{ getv "/elastic/node" "http://10.28.11.49:9200/" }}"
+    "node": "{{ getv "/configuration/elastic/node" "http://10.28.11.49:9200/" }}"
   },
   "elasticRequest": {
-    "from": "{{ getv "/elastic/from" "0" }}",
-    "size": "{{ getv "/elastic/size" "100" }}"
+    "from": "{{ getv "/configuration/elastic/request/from" "0" }}",
+    "size": "{{ getv "/configuration/elastic/request/size" "100" }}"
   }
 }

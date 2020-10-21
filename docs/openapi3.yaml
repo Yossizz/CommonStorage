@@ -89,7 +89,8 @@ paths:
         name: from
         required: false
         schema:
-          type: number
+          type: integer
+          minimum: 0
         example:
           50
       - in: query
@@ -97,9 +98,10 @@ paths:
         name: size
         required: false
         schema:
-          type: number
+          type: integer
+          minimum: 1
         example:
-          4       
+          5
       responses:
         200:
           description: Returns all documents that met the criteria.

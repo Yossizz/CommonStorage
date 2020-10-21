@@ -6,7 +6,7 @@ keys = [
     "/configuration/swagger/jsonPath",
     "/configuration/swagger/uiPath",
     "/configuration/swagger/port",
-    "/elastic/node",
-    "/elasticRequest/from",
-    "/elasticRequest/size"
+    "/configuration/elastic/node",
+    "/configuration/elastic/request/from",
+    "/configuration/elastic/request/size"
 ]
