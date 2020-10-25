@@ -151,7 +151,8 @@ export class IndexesController {
       const { name } = req.params;
       const { query, body: params } = req;
 
-      this.validateRequestBody(params);
+      this.validateRequestObject(params);
+      this.validateRequestObject(query);
 
       const searchResults: ApiResponse = await this.innerSearchDoc(name, query);
 
@@ -272,14 +273,14 @@ export class IndexesController {
     };
   }
 
-  private validateRequestBody(body: any) {
+  private validateRequestObject(body: any) {
     if (!Object.keys(body).length) {
       // A filtering object needs to be supplied.  This is the object we use to
-      // find existing documents.
+      // find existing documents OR the object we update/create with.
       const updateError: IError = {
         status: httpStatus.BAD_REQUEST,
         type: 'Could not process',
-        reason: 'Request body is empty while expected a filtering object',
+        reason: 'RequestBody or RequestQuery are missing but they are expected',
       };
 
       throw this.parseToElasticError(updateError);
