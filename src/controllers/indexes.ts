@@ -5,11 +5,7 @@ import { ApiResponse } from '@elastic/elasticsearch';
 import { get } from 'config';
 import { MCLogger } from '@map-colonies/mc-logger';
 import client from '../elasticClient';
-
-interface IElasticRequestConfig {
-  from: number;
-  size: number;
-}
+import { IError, IElasticRequestConfig } from '../globalModels';
 
 @injectable()
 export class IndexesController {
@@ -153,23 +149,26 @@ export class IndexesController {
   ): Promise<Response | void> {
     try {
       const { name } = req.params;
-      const query = req.query;
-      const { params } = req.body;
+      const { query, body: params } = req;
+
+      this.validateRequestBody(params);
+
       const searchResults: ApiResponse = await this.innerSearchDoc(name, query);
 
       let objectRetrurned = null;
       if (searchResults.body.hits.hits.length) {
         // we found hits. need to update
+        this.logger.info(`Updating documents in index "${name}" with this query: "${JSON.stringify(query)}" - these params: "${JSON.stringify(params)}"`);
         objectRetrurned = await this.innerUpdateByQuery(
           name,
           req.query,
           params
         );
-        this.logger.info(`Document(s) was updated in index ${name}`);
+        this.logger.info(`Document(s) were updated in index ${name}`);
       } else {
         // create
         objectRetrurned = await this.innerCreateDoc(name, params);
-        this.logger.info(`Doucment(s) was created in index ${name}`);
+        this.logger.info(`Document(s) were created in index ${name}`);
       }
 
       return res.status(httpStatus.OK).json(objectRetrurned);
@@ -217,11 +216,15 @@ export class IndexesController {
     index: string,
     reqQuery: any
   ): Promise<ApiResponse> {
-
     let { from, size, ...restParams } = reqQuery;
-    from = Number(from) >= 0 ? Math.round(Number(from)) : this.elasticRequestCfg.from;
-    size = size > 0 ? Math.min(Number(size), this.elasticRequestCfg.size)
-                    : this.elasticRequestCfg.size;    
+    from =
+      Number(from) >= 0
+        ? Math.round(Number(from))
+        : this.elasticRequestCfg.from;
+    size =
+      size > 0
+        ? Math.min(Number(size), this.elasticRequestCfg.size)
+        : this.elasticRequestCfg.size;
 
     const elasticQuery = this.buildElasticQuery(restParams);
     return await client.search({
@@ -253,5 +256,33 @@ export class IndexesController {
         },
       },
     });
+  }
+
+  private parseToElasticError(errorToParse: IError) {
+    return {
+      meta: {
+        body: {
+          status: errorToParse.status,
+          error: {
+            type: errorToParse.type,
+            reason: errorToParse.reason,
+          },
+        },
+      },
+    };
+  }
+
+  private validateRequestBody(body: any) {
+    if (!Object.keys(body).length) {
+      // A filtering object needs to be supplied.  This is the object we use to
+      // find existing documents.
+      const updateError: IError = {
+        status: httpStatus.BAD_REQUEST,
+        type: 'Could not process',
+        reason: 'Request body is empty while expected a filtering object',
+      };
+
+      throw this.parseToElasticError(updateError);
+    }
   }
 }
